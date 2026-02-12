@@ -3,13 +3,11 @@ package dev.jossh.orders;
 import dev.jossh.orders.entity.Order;
 import dev.jossh.orders.repository.IOrderRepository;
 import dev.jossh.orders.services.OrderService;
-import dev.jossh.orders.services.ProductService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
 import java.util.Optional;
@@ -38,6 +36,7 @@ class OrdersServiceApplicationTests {
         assertTrue(result.isPresent());
         assertEquals("PENDING", result.get().getStatus());
     }
+
     @Test
     void getOrderById_not_found() {
         when(repository.findById(1)).thenReturn(Optional.empty());
