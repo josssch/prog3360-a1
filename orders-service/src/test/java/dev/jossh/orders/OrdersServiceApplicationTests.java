@@ -2,6 +2,7 @@ package dev.jossh.orders;
 
 import dev.jossh.orders.entity.Order;
 import dev.jossh.orders.repository.IOrderRepository;
+import dev.jossh.orders.services.OrderService;
 import dev.jossh.orders.services.ProductService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,7 +24,7 @@ class OrdersServiceApplicationTests {
     IOrderRepository repository;
 
     @InjectMocks
-    IOrderRepository service;
+    OrderService service;
 
     @Test
     void getOrderById_found() {
@@ -32,7 +33,7 @@ class OrdersServiceApplicationTests {
         order.setStatus("PENDING");
         when(repository.findById(1)).thenReturn(Optional.of(order));
 
-        var result = service.findById(1);
+        var result = service.getById(1);
 
         assertTrue(result.isPresent());
         assertEquals("PENDING", result.get().getStatus());
@@ -41,7 +42,7 @@ class OrdersServiceApplicationTests {
     void getOrderById_not_found() {
         when(repository.findById(1)).thenReturn(Optional.empty());
 
-        var result = service.findById(1);
+        var result = service.getById(1);
 
         assertTrue(result.isEmpty());
     }
@@ -53,7 +54,7 @@ class OrdersServiceApplicationTests {
         order.setStatus("PENDING");
         when(repository.findAll()).thenReturn(List.of(order));
 
-        var result = service.findAll();
+        var result = service.getAllOrders();
 
         assertFalse(result.isEmpty());
     }

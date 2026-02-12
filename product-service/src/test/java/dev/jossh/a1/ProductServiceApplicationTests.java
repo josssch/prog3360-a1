@@ -25,7 +25,7 @@ class ProductServiceApplicationTests {
     IProductRepository repository;
 
     @InjectMocks
-    IProductService service;
+    ProductService service;
 
     @Test
     void getProductById_found() {
