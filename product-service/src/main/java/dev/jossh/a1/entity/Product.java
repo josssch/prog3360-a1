@@ -23,6 +23,9 @@ public class Product {
     @Column(nullable = false)
     private Integer quantity;
 
+    public Product() {
+    }
+
     public Integer getId() {
         return id;
     }
