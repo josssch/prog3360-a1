@@ -7,7 +7,7 @@ on:
 
 jobs:
   test-build:
-    name: Test & Build Order Service
+    name: Test & Build Services
     runs-on: ubuntu-latest
 
     steps:
@@ -27,21 +27,16 @@ jobs:
         run: ./mvnw clean install
       - name: Build & test orders-service package
         working-directory: orders-service
-        run: ./mvnw package
+        run: ./mvnw package > ../test-results.txt
       - name: Build & test product-service package
         working-directory: product-service
-        run: ./mvnw package
-      - name: Upload orders-service artifact
+        run: ./mvnw package >> ../test-results.txt
+      - name: Upload test results to artifact
         uses: actions/upload-artifact@v4
         with:
-          name: orders-service.jar
-          path: orders-service/target/*.jar
-      - name: Upload product-service artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: product-service.jar
-          path: product-service/target/*.jar
-
+          name: Test Results
+          path: ./test-results.txt
+  
   run-docker-compose:
     name: Run Docker Compose
     runs-on: ubuntu-latest
