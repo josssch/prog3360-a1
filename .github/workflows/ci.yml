@@ -1,0 +1,69 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [ master ]
+
+jobs:
+  test-build:
+    name: Test & Build Order Service
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: "temurin"
+          cache: "maven"
+      - name: Install order-service dependencies
+        working-directory: orders-service
+        run: ./mvnw clean install
+      - name: Install product-service dependencies
+        working-directory: product-service
+        run: ./mvnw clean install
+      - name: Build & test orders-service package
+        working-directory: orders-service
+        run: ./mvnw package
+      - name: Build & test product-service package
+        working-directory: product-service
+        run: ./mvnw package
+      - name: Upload orders-service artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: orders-service.jar
+          path: orders-service/target/*.jar
+      - name: Upload product-service artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: product-service.jar
+          path: product-service/target/*.jar
+
+  run-docker-compose:
+    name: Run Docker Compose
+    runs-on: ubuntu-latest
+    needs:
+      - test-build
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build order-service Docker image
+        run: docker build -t order-service:latest ./orders-service
+      - name: Build product-service Docker image
+        run: docker build -t product-service:latest ./product-service
+      - name: Docker Compose Up
+        run: docker compose up -d
+      - name: Wait for services to be healthy
+        run: |
+          echo "Waiting for services to become healthy..."
+          sleep 30
+          docker compose ps
+      - name: Test request to order service
+        run: |
+          curl -X POST http://localhost:3001/api/orders \
+            -H "Content-Type: application/json" \
+            -d '{"productId": 1, "totalPrice": 999.99, "quantity": 1}'
