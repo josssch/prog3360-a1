@@ -1,0 +1,28 @@
+name: products-order-services
+
+services:
+  order-service:
+    image: order-service:latest
+    ports: [ "3001:3000" ]
+    depends_on:
+      product-service:
+        condition: service_healthy
+    environment:
+      PORT: 3000
+      PRODUCT_SERVICE_URL: http://product-service:3000
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:3000/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  product-service:
+    image: product-service:latest
+    ports: [ "3000:3000" ]  # this is only for my testing purposes, these are fully capable of communicating without this
+    environment:
+      PORT: 3000
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:3000/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
